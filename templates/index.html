@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UJALA Web Launcher 🚀</title>
+    <style>
+        :root{
+            --primary:#ff4d4d;--secondary:#333;--accent:#0ff;--success:#3c3;--error:#f33;
+            --background:#080808;--surface:#111;--text:#f1f1f1;--border-radius:12px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+        body{background:linear-gradient(135deg,var(--background) 0%,#0a0a0a 100%);color:var(--text);min-height:100vh}
+        .container{max-width:1400px;margin:0 auto;padding:20px}
+        .header{background:linear-gradient(45deg,var(--surface),var(--secondary));border-radius:var(--border-radius);padding:20px;margin-bottom:20px;text-align:center}
+        .header h1{font-size:2.5rem;font-weight:700;background:linear-gradient(45deg,var(--accent),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .search-container{display:flex;gap:15px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:15px}
+        .search-box{flex:1;min-width:250px;padding:12px 20px;background:var(--surface);border:2px solid transparent;border-radius:var(--border-radius);color:var(--text)}
+        .search-box:focus{outline:none;border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,255,.3)}
+        .toolbar{background:linear-gradient(45deg,var(--surface),var(--secondary));border-radius:var(--border-radius);padding:15px;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+        .toolbar-btn{background:linear-gradient(145deg,var(--surface),var(--secondary));border:2px solid transparent;border-radius:25px;padding:10px 20px;color:var(--text);font-weight:600;cursor:pointer;transition:all .3s}
+        .toolbar-btn:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 5px 15px rgba(0,255,255,.3)}
+        .toolbar-btn.primary{background:linear-gradient(145deg,var(--primary),#c00)}
+        .toolbar-btn.success{background:linear-gradient(145deg,var(--success),#28a745)}
+        .main-content{display:grid;grid-template-columns:1fr 400px;gap:20px;min-height:70vh}
+        @media(max-width:1024px){.main-content{grid-template-columns:1fr}}
+        .scripts-panel,.log-panel{background:linear-gradient(135deg,var(--surface) 0%,rgba(17,17,17,.8) 100%);border-radius:var(--border-radius);padding:20px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+        .section-header{display:flex;align-items:center;gap:10px;margin:20px 0 10px;padding:10px 15px;background:linear-gradient(45deg,var(--accent),var(--primary));border-radius:var(--border-radius);font-weight:700;color:#fff}
+        .scripts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-top:20px}
+        .script-button{background:linear-gradient(145deg,var(--surface),var(--secondary));border:2px solid transparent;border-radius:var(--border-radius);padding:15px;color:var(--text);font-weight:600;cursor:pointer;transition:all .3s;position:relative;text-align:center;min-height:80px;display:flex;align-items:center;justify-content:center;font-size:14px}
+        .script-button:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 10px 30px rgba(0,255,255,.3)}
+        .script-button.running{background:linear-gradient(145deg,var(--success),#28a745);border-color:var(--success);animation:pulse 2s infinite}
+        .log-content{flex:1;background:var(--background);border-radius:8px;padding:15px;font-family:Consolas,monospace;font-size:13px;line-height:1.4;max-height:500px;overflow-y:auto;border:1px solid var(--secondary)}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center;z-index:1000}
+        .modal-content{background:linear-gradient(135deg,var(--surface),var(--secondary));border-radius:var(--border-radius);padding:30px;width:90%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+        .form-group{margin-bottom:15px}
+        .form-group label{display:block;margin-bottom:5px;color:var(--accent);font-weight:600}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;background:var(--background);border:1px solid var(--secondary);border-radius:8px;color:var(--text)}
+        .btn-group{display:flex;gap:15px;justify-content:center;margin-top:20px}
+        .btn{padding:10px 20px;border:none;border-radius:25px;font-weight:600;cursor:pointer}
+        .btn-primary{background:linear-gradient(145deg,var(--primary),#c00);color:#fff}
+        .btn-success{background:linear-gradient(145deg,var(--success),#28a745);color:#fff}
+        .btn-secondary{background:linear-gradient(145deg,var(--surface),var(--secondary));color:var(--text)}
+        .hidden{display:none}
+        .toast{position:fixed;top:20px;right:20px;background:linear-gradient(145deg,var(--success),#28a745);color:#fff;padding:15px 25px;border-radius:var(--border-radius);z-index:1001;transform:translateX(100%);transition:all .3s}
+        .toast.show{transform:translateX(0)}
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(51,204,51,.7)}70%{box-shadow:0 0 0 10px rgba(51,204,51,0)}100%{box-shadow:0 0 0 0 rgba(51,204,51,0)}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>UJALA 🚀</h1>
+            <div class="search-container">
+                <input type="text" id="searchBox" class="search-box" placeholder="🔎 Search your scripts...">
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="toolbar-btn" onclick="showAddFolder()">📁 Add Folder</button>
+            <button class="toolbar-btn" onclick="showUpload()">📤 Upload</button>
+            <button class="toolbar-btn primary" onclick="stopAll()">⏹ Stop All</button>
+        </div>
+
+        <div class="main-content">
+            <div class="scripts-panel">
+                <div id="scriptsContainer"></div>
+            </div>
+            <div class="log-panel">
+                <h3>📋 Console Output</h3>
+                <div id="logContent" class="log-content">
+                    <div class="log-entry info">🚀 UJALA ready. Add a folder or upload .py files to begin.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Folder Modal -->
+    <div class="modal" id="folderModal">
+        <div class="modal-content">
+            <h3>📁 Monitor Folder</h3>
+            <div class="form-group">
+                <label>Folder Path</label>
+                <input type="text" id="folderPath" placeholder="C:\Users\you\scripts">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="addFolder()">Add</button>
+                <button class="btn btn-secondary" onclick="closeModal('folderModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h3>📤 Upload Script</h3>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="file" accept=".py" required>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">Upload</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('uploadModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let scripts = [];
+        let running = new Set();
+
+        socket.on('connect', () => {
+            appendLog("🔗 Connected to UJALA server", "info");
+            fetchScripts();
+        });
+
+        function fetchScripts() {
+            fetch('/api/scripts')
+                .then(r => r.json())
+                .then(data => {
+                    scripts = data.scripts;
+                    running = new Set(data.running);
+                    renderScripts();
+                });
+        }
+
+        function renderScripts() {
+            const container = document.getElementById('scriptsContainer');
+            container.innerHTML = '';
+            const filtered = scripts.filter(s =>
+                s.name.toLowerCase().includes(document.getElementById('searchBox').value.toLowerCase())
+            );
+
+            const cats = {};
+            filtered.forEach(s => {
+                const c = s.category || '📂 Scripts';
+                (cats[c] = cats[c] || []).push(s);
+            });
+
+            Object.entries(cats).forEach(([cat, list]) => {
+                const hdr = document.createElement('div');
+                hdr.className = 'section-header';
+                hdr.textContent = cat;
+                container.appendChild(hdr);
+
+                const grid = document.createElement('div');
+                grid.className = 'scripts-grid';
+                list.forEach(s => grid.appendChild(createButton(s)));
+                container.appendChild(grid);
+            });
+        }
+
+        function createButton(s) {
+            const btn = document.createElement('div');
+            btn.className = 'script-button';
+            if (running.has(s.id)) btn.classList.add('running');
+            btn.innerHTML = `
+                <div>
+                    <strong>${s.name}</strong><br>
+                    <small>${s.description}</small>
+                </div>`;
+            btn.onclick = () => toggleScript(s);
+            return btn;
+        }
+
+        function toggleScript(s) {
+            if (running.has(s.id)) {
+                fetch(`/api/scripts/${s.id}/stop`, {method: 'POST'});
+            } else {
+                fetch(`/api/scripts/${s.id}/run`, {method: 'POST'});
+            }
+        }
+
+        socket.on('script_started', d => { running.add(d.script_id); renderScripts(); });
+        socket.on('script_stopped', d => { running.delete(d.script_id); renderScripts(); });
+        socket.on('script_log', d => appendLog(d.log.message, d.log.type));
+
+        function appendLog(text, type) {
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.textContent = text;
+            const lc = document.getElementById('logContent');
+            lc.appendChild(div);
+            lc.scrollTop = lc.scrollHeight;
+        }
+
+        function showAddFolder()  { document.getElementById('folderModal').style.display='flex'; }
+        function showUpload()     { document.getElementById('uploadModal').style.display='flex'; }
+        function closeModal(id)   { document.getElementById(id).style.display='none'; }
+
+        function addFolder() {
+            const path = document.getElementById('folderPath').value.trim();
+            if (!path) return;
+            fetch('/api/folders', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({folders: [path]})
+            }).then(() => { closeModal('folderModal'); fetchScripts(); });
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            fetch('/api/scripts/upload', {method: 'POST', body: fd})
+                .then(r => r.json())
+                .then(() => { closeModal('uploadModal'); fetchScripts(); });
+        });
+
+        function stopAll() {
+            fetch('/api/scripts/stop-all', {method: 'POST'})
+                .then(() => appendLog("⏹ All scripts stopped", "info"));
+        }
+
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('modal')) e.target.style.display='none';
+        });
+    </script>
+</body>
+</html>
